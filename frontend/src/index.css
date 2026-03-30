@@ -1,0 +1,72 @@
+@import "tailwindcss";
+
+@theme {
+  --color-premium-50: #FAFAF8;
+  --color-premium-100: #F3F1EC;
+  --color-premium-200: #E6E1D7;
+  --color-premium-300: #D0C5B5;
+  --color-premium-400: #B8A68E;
+  --color-premium-500: #A18868;
+  --color-premium-600: #846E53;
+  --color-premium-700: #6B5841;
+  --color-premium-800: #534331;
+  --color-premium-900: #4B3B2B;
+  --color-premium-black: #29241B;
+
+  --font-sans: 'Outfit', sans-serif;
+  --font-serif: 'Playfair Display', serif;
+
+  --animate-fade-in: fadeIn 0.5s ease-out forwards;
+  --animate-slide-up: slideUp 0.5s ease-out forwards;
+
+  @keyframes fadeIn {
+    0% { opacity: 0; }
+    100% { opacity: 1; }
+  }
+  @keyframes slideUp {
+    0% { opacity: 0; transform: translateY(20px); }
+    100% { opacity: 1; transform: translateY(0); }
+  }
+}
+
+
+@layer base {
+  @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap');
+
+  body {
+    @apply font-sans antialiased text-premium-900 bg-premium-50 transition-colors duration-300;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-serif;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply bg-premium-900 text-white px-6 py-3 rounded hover:bg-premium-800 transition-all duration-300 font-medium;
+  }
+  
+  .btn-outline {
+    @apply border border-premium-900 text-premium-900 px-6 py-3 rounded hover:bg-premium-900 hover:text-white transition-all duration-300 font-medium;
+  }
+
+  .glass-panel {
+    @apply bg-white/70 backdrop-blur-md border border-white/20 shadow-lg;
+  }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #fbfaf9;
+}
+::-webkit-scrollbar-thumb {
+  background: #d2c2b9;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #a38274;
+}
