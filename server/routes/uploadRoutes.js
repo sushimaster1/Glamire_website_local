@@ -5,16 +5,12 @@ const { protect, sellerOnly } = require('../middleware/authMiddleware');
 
 const router = express.Router();
 
-// Configure Cloudinary
+// Configure Cloudinary (only cloud_name needed for unsigned uploads)
 cloudinary.config({
     cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
     api_key: process.env.CLOUDINARY_API_KEY,
     api_secret: process.env.CLOUDINARY_API_SECRET,
 });
-
-// Log config on startup to verify env vars are loaded
-console.log('[Cloudinary] cloud_name:', process.env.CLOUDINARY_CLOUD_NAME || 'MISSING');
-console.log('[Cloudinary] api_key:', process.env.CLOUDINARY_API_KEY ? 'SET' : 'MISSING');
 
 // Use memory storage — files never touch disk
 const storage = multer.memoryStorage();
@@ -37,14 +33,20 @@ const upload = multer({
     },
 });
 
-// Helper: upload a buffer to Cloudinary
+// Helper: upload a buffer to Cloudinary using unsigned preset
 function uploadToCloudinary(buffer, mimetype) {
     return new Promise((resolve, reject) => {
         const resourceType = mimetype.startsWith('video') ? 'video' : 'image';
         const stream = cloudinary.uploader.upload_stream(
-            { folder: 'glamire', resource_type: resourceType },
+            {
+                upload_preset: 'glamire_preset',
+                resource_type: resourceType,
+            },
             (error, result) => {
-                if (error) return reject(error);
+                if (error) {
+                    console.error('[Cloudinary] Stream error:', JSON.stringify(error));
+                    return reject(error);
+                }
                 resolve(result.secure_url);
             }
         );
