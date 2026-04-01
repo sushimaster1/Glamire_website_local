@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { API_BASE_URL } from '../utils/api';
 import useStore from '../store/useStore';
 import { GoogleLogin } from '@react-oauth/google';
 
@@ -19,7 +20,7 @@ const Signup = () => {
     setLoading(true);
     setError('');
     try {
-      const response = await axios.post('http://localhost:3000/api/auth/register', {
+      const response = await axios.post(`${API_BASE_URL}/api/auth/register`, {
         name, email, password, role: 'user'
       });
       await setUser(response.data, response.data.token);
@@ -33,7 +34,7 @@ const Signup = () => {
 
   const handleGoogleSuccess = async (credentialResponse) => {
     try {
-      const response = await axios.post('http://localhost:3000/api/auth/google', {
+      const response = await axios.post(`${API_BASE_URL}/api/auth/google`, {
         credential: credentialResponse.credential,
       });
       await setUser(response.data, response.data.token);

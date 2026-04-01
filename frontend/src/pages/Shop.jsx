@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import axios from 'axios';
+import { API_BASE_URL } from '../utils/api';
 import ProductCard from '../components/ProductCard';
 import { SlidersHorizontal, ChevronDown } from 'lucide-react';
 
@@ -28,8 +29,8 @@ const Shop = () => {
       setLoading(true);
       try {
         const url = searchQuery 
-          ? `http://localhost:3000/api/products?search=${encodeURIComponent(searchQuery)}`
-          : 'http://localhost:3000/api/products';
+          ? `${API_BASE_URL}/api/products?search=${encodeURIComponent(searchQuery)}`
+          : `${API_BASE_URL}/api/products`;
         const { data } = await axios.get(url);
         const productList = Object.values(data);
         setProducts(productList);

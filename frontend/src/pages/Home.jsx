@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 import ProductCard from '../components/ProductCard';
-import { getMediaUrl } from '../utils/api';
+import { getMediaUrl, API_BASE_URL } from '../utils/api';
 import useStore from '../store/useStore';
 
 const Home = () => {
@@ -16,11 +16,11 @@ const Home = () => {
     useEffect(() => {
         const fetchHomeData = async () => {
              try {
-                 const { data: prods } = await axios.get('http://localhost:3000/api/products');
+                 const { data: prods } = await axios.get(`${API_BASE_URL}/api/products`);
                  const productList = Object.values(prods).slice(0, 4);
                  setProducts(productList);
 
-                 const { data: curated } = await axios.get('http://localhost:3000/api/products/categories?curatedOnly=true');
+                 const { data: curated } = await axios.get(`${API_BASE_URL}/api/products/categories?curatedOnly=true`);
                  setCuratedCollections(curated);
              } catch (err) {
                  console.error("Failed to load home data", err);

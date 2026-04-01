@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import axios from 'axios';
-
+import { API_BASE_URL } from '../utils/api';
 const useStore = create(
   persist(
     (set, get) => ({
@@ -14,7 +14,7 @@ const useStore = create(
       
       fetchCategories: async () => {
         try {
-          const { data } = await axios.get('http://localhost:3000/api/products/categories');
+          const { data } = await axios.get(`${API_BASE_URL}/api/products/categories`);
           set({ categories: data });
         } catch (err) {
           console.error('Failed to fetch categories', err);
@@ -23,7 +23,7 @@ const useStore = create(
 
       fetchSettings: async () => {
         try {
-          const { data } = await axios.get('http://localhost:3000/api/settings');
+          const { data } = await axios.get(`${API_BASE_URL}/api/settings`);
           set({ settings: data });
         } catch (err) {
           console.error('Failed to fetch settings', err);
@@ -35,7 +35,7 @@ const useStore = create(
         if (token) {
           // Sync profile and merge guest cart
           try {
-            const { data: profile } = await axios.get('http://localhost:3000/api/users/profile', {
+            const { data: profile } = await axios.get(`${API_BASE_URL}/api/users/profile`, {
               headers: { Authorization: `Bearer ${token}` }
             });
 
@@ -69,7 +69,7 @@ const useStore = create(
               quantity: item.quantity
             }));
             
-            await axios.post('http://localhost:3000/api/users/cart', 
+            await axios.post(`${API_BASE_URL}/api/users/cart`, 
               { cartItems: formattedForServer },
               { headers: { Authorization: `Bearer ${token}` } }
             );
@@ -96,7 +96,7 @@ const useStore = create(
             variant: item.variant,
             quantity: item.quantity
           }));
-          await axios.post('http://localhost:3000/api/users/cart', 
+          await axios.post('${API_BASE_URL}/api/users/cart', 
             { cartItems }, 
             { headers: { Authorization: `Bearer ${token}` } }
           );
@@ -166,7 +166,7 @@ const useStore = create(
 
         if (token) {
           try {
-            await axios.post('http://localhost:3000/api/users/wishlist', 
+            await axios.post(`${API_BASE_URL}/api/users/wishlist`, 
               { productId: product._id },
               { headers: { Authorization: `Bearer ${token}` } }
             );

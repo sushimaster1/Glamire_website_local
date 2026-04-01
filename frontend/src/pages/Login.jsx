@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { API_BASE_URL } from '../utils/api';
 import useStore from '../store/useStore';
 import { GoogleLogin } from '@react-oauth/google';
 
@@ -18,7 +19,7 @@ const Login = () => {
     setLoading(true);
     setError('');
     try {
-      const response = await axios.post('http://localhost:3000/api/auth/login', { email, password });
+      const response = await axios.post(`${API_BASE_URL}/api/auth/login`, { email, password });
       await setUser(response.data, response.data.token);
       response.data.role === 'seller' ? navigate('/seller') : navigate('/');
     } catch (err) {
@@ -30,7 +31,7 @@ const Login = () => {
 
   const handleGoogleSuccess = async (credentialResponse) => {
     try {
-      const response = await axios.post('http://localhost:3000/api/auth/google', {
+      const response = await axios.post(`${API_BASE_URL}/api/auth/google`, {
         credential: credentialResponse.credential,
       });
       await setUser(response.data, response.data.token);
