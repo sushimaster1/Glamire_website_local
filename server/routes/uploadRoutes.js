@@ -12,6 +12,10 @@ cloudinary.config({
     api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
+// Log config on startup to verify env vars are loaded
+console.log('[Cloudinary] cloud_name:', process.env.CLOUDINARY_CLOUD_NAME || 'MISSING');
+console.log('[Cloudinary] api_key:', process.env.CLOUDINARY_API_KEY ? 'SET' : 'MISSING');
+
 // Use memory storage — files never touch disk
 const storage = multer.memoryStorage();
 
@@ -58,7 +62,7 @@ router.post('/', protect, sellerOnly, upload.single('image'), async (req, res) =
         res.send(url);
     } catch (err) {
         console.error('Cloudinary upload error:', err);
-        res.status(500).json({ message: 'Upload failed' });
+        res.status(500).json({ message: 'Upload failed', detail: err.message || String(err) });
     }
 });
 
@@ -74,7 +78,7 @@ router.post('/multiple', protect, sellerOnly, upload.array('images', 10), async 
         res.json(urls);
     } catch (err) {
         console.error('Cloudinary upload error:', err);
-        res.status(500).json({ message: 'Upload failed' });
+        res.status(500).json({ message: 'Upload failed', detail: err.message || String(err) });
     }
 });
 
