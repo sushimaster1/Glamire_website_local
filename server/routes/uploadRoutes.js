@@ -43,4 +43,12 @@ router.post('/', protect, sellerOnly, upload.single('image'), (req, res) => {
     res.send(`/${req.file.path}`);
 });
 
+router.post('/multiple', protect, sellerOnly, upload.array('images', 10), (req, res) => {
+    if (!req.files || req.files.length === 0) {
+        return res.status(400).send('No images uploaded');
+    }
+    const paths = req.files.map(file => `/${file.path}`);
+    res.json(paths);
+});
+
 module.exports = router;

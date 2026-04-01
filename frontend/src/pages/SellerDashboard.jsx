@@ -20,6 +20,7 @@ const SellerDashboard = () => {
     const [collectionMeta, setCollectionMeta] = useState([]);
     const [loading, setLoading] = useState(true);
     const [isAddingProduct, setIsAddingProduct] = useState(false);
+    const [editingProduct, setEditingProduct] = useState(null);
     const [activeCollection, setActiveCollection] = useState(null);
     const [draftCollections, setDraftCollections] = useState(() => {
         try { return JSON.parse(localStorage.getItem('sellerDraftCollections')) || []; }
@@ -33,6 +34,7 @@ const SellerDashboard = () => {
     const handleTabSwitch = (tab) => {
         setActiveTab(tab);
         setIsAddingProduct(false);
+        setEditingProduct(null);
         if (tab !== 'collections') setActiveCollection(null);
     };
 
@@ -131,6 +133,7 @@ const SellerDashboard = () => {
 
     const handleProductAdded = async () => {
         setIsAddingProduct(false);
+        setEditingProduct(null);
         // Refresh products
         try {
             const { data } = await axios.get(`${API_BASE_URL}/api/products`);
@@ -371,8 +374,13 @@ const SellerDashboard = () => {
 
                             {/* Products Tab */}
                             {activeTab === 'products' && (
-                                isAddingProduct ? (
-                                    <AddProductForm user={user} onSuccess={handleProductAdded} onCancel={() => setIsAddingProduct(false)} />
+                                (isAddingProduct || editingProduct) ? (
+                                    <AddProductForm 
+                                        user={user} 
+                                        onSuccess={handleProductAdded} 
+                                        onCancel={() => { setIsAddingProduct(false); setEditingProduct(null); }} 
+                                        initialProduct={editingProduct}
+                                    />
                                 ) : (
                                     <div className="bg-white rounded-sm border border-premium-100 shadow-sm overflow-hidden">
                                         <div className="p-6 border-b border-premium-100 flex justify-between items-center bg-premium-50">
@@ -411,7 +419,7 @@ const SellerDashboard = () => {
                                                                 </span>
                                                             </td>
                                                             <td className="p-4 flex justify-end gap-2 border-none">
-                                                                <button className="p-2 text-premium-500 hover:text-premium-900 hover:bg-premium-100 rounded transition-colors"><Pencil size={16} /></button>
+                                                                <button onClick={() => setEditingProduct(product)} className="p-2 text-premium-500 hover:text-premium-900 hover:bg-premium-100 rounded transition-colors"><Pencil size={16} /></button>
                                                                 <button onClick={() => handleDeleteProduct(product._id)} className="p-2 text-red-400 hover:text-red-700 hover:bg-red-50 rounded transition-colors"><Trash2 size={16} /></button>
                                                             </td>
                                                         </tr>
