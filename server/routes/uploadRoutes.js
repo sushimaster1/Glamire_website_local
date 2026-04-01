@@ -1,16 +1,8 @@
 const express = require('express');
 const multer = require('multer');
-const { v2: cloudinary } = require('cloudinary');
 const { protect, sellerOnly } = require('../middleware/authMiddleware');
 
 const router = express.Router();
-
-// Configure Cloudinary (only cloud_name needed for unsigned uploads)
-cloudinary.config({
-    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-    api_key: process.env.CLOUDINARY_API_KEY,
-    api_secret: process.env.CLOUDINARY_API_SECRET,
-});
 
 // Use memory storage — files never touch disk
 const storage = multer.memoryStorage();
@@ -33,25 +25,30 @@ const upload = multer({
     },
 });
 
-// Helper: upload a buffer to Cloudinary using unsigned preset
-function uploadToCloudinary(buffer, mimetype) {
-    return new Promise((resolve, reject) => {
-        const resourceType = mimetype.startsWith('video') ? 'video' : 'image';
-        const stream = cloudinary.uploader.upload_stream(
-            {
-                upload_preset: 'glamire_preset',
-                resource_type: resourceType,
-            },
-            (error, result) => {
-                if (error) {
-                    console.error('[Cloudinary] Stream error:', JSON.stringify(error));
-                    return reject(error);
-                }
-                resolve(result.secure_url);
-            }
-        );
-        stream.end(buffer);
-    });
+// Upload directly to Cloudinary REST API (unsigned preset — no signature required)
+async function uploadToCloudinary(buffer, mimetype) {
+    const resourceType = mimetype.startsWith('video') ? 'video' : 'image';
+    const cloudName = process.env.CLOUDINARY_CLOUD_NAME || 'dvginluil';
+
+    // Build multipart form using Node.js built-in FormData (available in Node 18+)
+    const formData = new FormData();
+    const blob = new Blob([buffer], { type: mimetype });
+    formData.append('file', blob, 'upload');
+    formData.append('upload_preset', 'glamire_preset');
+
+    const res = await fetch(
+        `https://api.cloudinary.com/v1_1/${cloudName}/${resourceType}/upload`,
+        { method: 'POST', body: formData }
+    );
+
+    if (!res.ok) {
+        const errData = await res.json().catch(() => ({}));
+        console.error('[Cloudinary REST] Error:', errData);
+        throw new Error(errData.error?.message || `HTTP ${res.status}`);
+    }
+
+    const data = await res.json();
+    return data.secure_url;
 }
 
 // POST /api/upload — single file
@@ -63,8 +60,8 @@ router.post('/', protect, sellerOnly, upload.single('image'), async (req, res) =
         const url = await uploadToCloudinary(req.file.buffer, req.file.mimetype);
         res.send(url);
     } catch (err) {
-        console.error('Cloudinary upload error:', err);
-        res.status(500).json({ message: 'Upload failed', detail: err.message || String(err) });
+        console.error('Upload error:', err.message);
+        res.status(500).json({ message: 'Upload failed', detail: err.message });
     }
 });
 
@@ -79,8 +76,8 @@ router.post('/multiple', protect, sellerOnly, upload.array('images', 10), async 
         );
         res.json(urls);
     } catch (err) {
-        console.error('Cloudinary upload error:', err);
-        res.status(500).json({ message: 'Upload failed', detail: err.message || String(err) });
+        console.error('Upload error:', err.message);
+        res.status(500).json({ message: 'Upload failed', detail: err.message });
     }
 });
 
