@@ -11,7 +11,7 @@ const Checkout = () => {
   const [address, setAddress] = useState({
     street: '', city: '', state: '', zip: '', country: 'India'
   });
-  const [paymentMethod, setPaymentMethod] = useState('razorpay');
+  const [paymentMethod, setPaymentMethod] = useState('cod');
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
 
@@ -70,6 +70,11 @@ const Checkout = () => {
     }
 
     try {
+      // Online payment is temporarily disabled
+      setErrorMsg("Online payment is temporarily unavailable. Please use Cash on Delivery.");
+      setLoading(false);
+      return;
+
       // 1. Create Razorpay order on our backend
       const res = await axios.post(`${API_BASE_URL}/api/payments/create-order`, {
         amount: totalAmount
@@ -135,7 +140,8 @@ const Checkout = () => {
     }
   };
 
-  // Add Razorpay script
+  // Razorpay script disabled for now
+  /*
   useEffect(() => {
     const script = document.createElement('script');
     script.src = 'https://checkout.razorpay.com/v1/checkout.js';
@@ -143,6 +149,7 @@ const Checkout = () => {
     document.body.appendChild(script);
     return () => { document.body.removeChild(script); }
   }, []);
+  */
 
   return (
     <div className="min-h-screen pt-28 pb-20 bg-premium-50">
@@ -221,19 +228,19 @@ const Checkout = () => {
             <div className="bg-white p-8 rounded-sm shadow-sm border border-premium-100 mt-8">
               <h2 className="text-2xl font-serif text-premium-900 mb-6 tracking-wide">Payment Method</h2>
               <div className="space-y-4">
-                <label className={`block border rounded-sm p-4 cursor-pointer transition-colors ${paymentMethod === 'razorpay' ? 'border-premium-900 bg-premium-50' : 'border-premium-200 hover:border-premium-400'}`}>
+                <label className={`block border rounded-sm p-4 opacity-60 cursor-not-allowed transition-colors border-premium-200`}>
                   <div className="flex items-center">
                     <input 
                       type="radio" 
                       name="payment_method" 
                       value="razorpay" 
-                      checked={paymentMethod === 'razorpay'} 
-                      onChange={() => setPaymentMethod('razorpay')}
-                      className="w-4 h-4 text-premium-900 focus:ring-premium-900 border-premium-300"
+                      disabled
+                      checked={false}
+                      className="w-4 h-4 text-premium-300 border-premium-300 cursor-not-allowed"
                     />
                     <div className="ml-3">
-                      <span className="block font-medium text-premium-900">Pay Online</span>
-                      <span className="block text-sm text-premium-500 mt-1">Cards, UPI, NetBanking, Wallets securely via Razorpay</span>
+                      <span className="block font-medium text-premium-400">Pay Online (Unavailable)</span>
+                      <span className="block text-sm text-premium-400 mt-1">Online payment is temporarily disabled for security reasons.</span>
                     </div>
                   </div>
                 </label>

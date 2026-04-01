@@ -75,8 +75,10 @@ const Navbar = () => {
 
           {/* Logo */}
           <div className="flex-shrink-0 flex justify-center md:w-1/3">
-            <Link to="/" className="text-2xl md:text-3xl font-serif font-medium text-premium-900 tracking-widest">
-              Glamire Fashion
+            <Link to="/" className="flex items-center">
+              <span className="text-2xl md:text-3xl font-serif font-medium text-premium-900 tracking-widest">
+                Glamire Fashion
+              </span>
             </Link>
           </div>
 
